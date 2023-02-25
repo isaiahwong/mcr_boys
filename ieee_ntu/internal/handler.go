@@ -25,12 +25,11 @@ func (s *Server) queryHandler(c *gin.Context) {
 	for rows.Next() {
 		var id int
 		var balance float64
-		var name string
-		err = rows.Scan(&id, &balance, &name)
+		err = rows.Scan(&id, &balance)
 		if err != nil {
 			log.Fatal(err)
 		}
-		accounts = append(accounts, &Account{AccountId: id, Balance: balance, Owner: name})
+		accounts = append(accounts, &Account{AccountId: id, Balance: balance})
 	}
 
 	// convert to json bytes
@@ -55,7 +54,7 @@ func (s *Server) txHandler(c *gin.Context) {
 	rand.Seed(time.Now().UnixNano())
 
 	// Generate a random integer between 0 and 99
-	id := rand.Intn(1)
+	id := rand.Intn(100000)
 	balance := rand.Intn(100000)
 
 	// Prepare a statement for inserting a new record into the "people" table
@@ -66,7 +65,7 @@ func (s *Server) txHandler(c *gin.Context) {
 	defer stmt.Close()
 
 	// Insert a new record using the prepared statement
-	_, err = stmt.Exec(balance, 1)
+	_, err = stmt.Exec(balance, id)
 	if err != nil {
 		// If there's an error, rollback the transaction
 		tx.Rollback()
