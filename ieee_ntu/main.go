@@ -18,7 +18,7 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "admin"
-	dbname   = "testdb"
+	dbname   = "dev"
 )
 
 var db *sql.DB
