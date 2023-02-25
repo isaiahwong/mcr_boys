@@ -10,29 +10,35 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 const (
-    dbDriver = "mysql"
-    dbSource = "root:password@tcp(127.0.0.1:3306)/accounts_db"
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "password"
+	dbname   = "testdb"
 )
 
 var db *sql.DB
 
-func init() {
-    var err error
-    db, err = sql.Open(dbDriver, dbSource)
-    if err != nil {
-        log.Fatal(err)
-    }
+func initDB() {
+	var err error
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+	db, err = sql.Open("postgres", psqlInfo)
+	if err != nil {
+		log.Fatal("Error opening database connection: ", err)
+	}
 
-    if err = db.Ping(); err != nil {
-        log.Fatal(err)
-    }
+	if err = db.Ping(); err != nil {
+		log.Fatal("Error pinging database: ", err)
+	}
 
-    log.Println("Connected to database")
+	log.Println("Connected to database!")
 }
+
 
 func QueryBalance(w http.ResponseWriter, r *http.Request) {
     // Get the account ID from the request parameters
@@ -146,6 +152,6 @@ func main() {
 
     http.HandleFunc("/query_balance", QueryBalance)
 
-    log.Println("Server started on port 8080")
-    log.Fatal(http.ListenAndServe(":8080", nil))
+    log.Println("Server started on port 5432")
+    log.Fatal(http.ListenAndServe(":5432", nil))
 }
